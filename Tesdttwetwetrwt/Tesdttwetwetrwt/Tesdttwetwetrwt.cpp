@@ -26,20 +26,32 @@ template<typename T>
 class Node
 {
 public:
+
 	T val;
 	Node<T>* next;
 	Node<T>* previosus;
+
+	Node() {
+		this->next = this;
+		this->previosus = this;
+	}
+
+	Node(const T& val, Node<T>* next, Node<T>* previous) {
+		this->val = val;
+
+		this->next = next;
+		this->previosus = previous;
+
+		previous -> next = this;
+		next->previosus = this;
+	}
+
 	Node(const T& val) {
 		this->val = val;
 		this->next = this;
 		this->previosus = this;
 	}
-	Node()
-	{
-		val = 0;
-		next = this;
-		previosus = this;
-	}
+	
 
 
 	~Node()
@@ -162,11 +174,10 @@ public:
 public:
 
 	List() {
-
-		head = NULL;
+		head = new Node<T>();
 	}
 	List(const T values[], int size) {
-		head = NULL;
+		head = new Node<T>();
 		//const auto size = sizeof(values) == 0 ? 0 : size;
 		for (int i = 0; i < size; ++i)
 		{
@@ -198,10 +209,10 @@ public:
 
 
 	iterator<T> beginn() {
-		return iterator<T>(head);
+		return iterator<T>(head->next);
 	}
 	iterator<T> end() {
-		return iterator<T>(head->previosus);
+		return iterator<T>(head);
 	}
 	reverse_iteratorr<T> beginnn() {
 		return reverse_iteratorr<T>(head->previosus);
@@ -261,36 +272,29 @@ public:
 	//template<class T>
 	static Node<T>* add_before_head(const T& value, Node<T>*& head) {
 
-		Node<T>* newNode = new Node<T>(value);
 
-		if (head == NULL) {
-			head = newNode;
-			newNode->next = newNode;
-			newNode->previosus = newNode;
+		if (isListEmpty(head)) {
+			Node<T>* newNode = new Node<T>(value,head,head);
+			
 			return head;
 		}
 		else {
-			Node<T>* current = head;
-			newNode->previosus = current->previosus;
-			newNode->next = current;
-			current->previosus = newNode;
-			do
-			{
-				current = current->next;
-			} while (current->next != head);
-			current->next = newNode;
-			head = newNode;
+			Node<T>* newNode = new Node<T>(value, head, head->previosus);
 
 			return head;
 		}
 		return 0;
 	}
 
+	static bool isListEmpty(Node<T>* head) {
+		return head->next == head && head->previosus == head;
+	}
+
 
 
 
 	void print()const {
-		Node<T>* temp = head;
+		Node<T>* temp = head->next;
 		if (temp == nullptr) {
 			cout << "List is empty" << endl;
 			return;
@@ -419,7 +423,7 @@ int main()
 	List<string> list3(myNum, x);
 	list3.print();
 
-
+   
 	/*int i1=0, i2 = 0;
 	cout <<"i1= "<< ++i1<<endl;
 	cout << "i1= "<< i2++<<endl;
@@ -432,7 +436,7 @@ int main()
 		it != list3.end();
 		it++)
 	{
-		cout << *it << " ";
+		cout << "f: " << *it << " ";
 	}
 	cout << endl;
 
